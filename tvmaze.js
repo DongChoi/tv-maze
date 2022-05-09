@@ -12748,9 +12748,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 var axios_1 = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 var $showsList = $("#showsList");
+var $episodesList = $("#episodesList");
 var $episodesArea = $("#episodesArea");
 var $searchForm = $("#searchForm");
 var BASE_URL_API = "https://api.tvmaze.com";
+var ALTIMAGE = "https://tinyurl.com/tv-missing";
 /** Given a search term, search for tv shows that match that query.
  *
  *  Returns (promise) array of show objects: [show, show, ...].
@@ -12765,7 +12767,16 @@ function getShowsByTerm(term) {
                 case 0: return [4 /*yield*/, axios_1.default.get("".concat(BASE_URL_API, "/search/shows?q=").concat(term))];
                 case 1:
                     resp = _a.sent();
-                    return [2 /*return*/, resp.data];
+                    return [2 /*return*/, resp.data.map(function (result) {
+                            var _a;
+                            return {
+                                id: result.show.id,
+                                name: result.show.name,
+                                summary: result.show.summary,
+                                image: ((_a = result.show.image) === null || _a === void 0 ? void 0 : _a.medium) || ALTIMAGE,
+                                //optional chaining!!
+                            };
+                        })];
             }
         });
     });
@@ -12775,13 +12786,15 @@ function populateShows(shows) {
     $showsList.empty();
     for (var _i = 0, shows_1 = shows; _i < shows_1.length; _i++) {
         var show = shows_1[_i];
-        var $show = $("<div data-show-id=\"".concat(show.id, "\" class=\"Show col-md-12 col-lg-6 mb-4\">\n         <div class=\"media\">\n           <img\n              src=\"http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg\"\n              alt=\"Bletchly Circle San Francisco\"\n              class=\"w-25 me-3\">\n           <div class=\"media-body\">\n             <h5 class=\"text-primary\">").concat(show.name, "</h5>\n             <div><small>").concat(show.summary, "</small></div>\n             <button class=\"btn btn-outline-light btn-sm Show-getEpisodes\">\n               Episodes\n             </button>\n           </div>\n         </div>\n       </div>\n      "));
+        console.log("SHOW ID IN LOOP", show.id);
+        var $show = $("<div data-show-id=\"".concat(show.id, "\" class=\"Show col-md-12 col-lg-6 mb-4\">\n         <div class=\"media\">\n           <img\n              src=").concat(show.image, "\n              alt=").concat(ALTIMAGE, "\n              class=\"w-25 me-3\">\n           <div class=\"media-body\">\n             <h5 class=\"text-primary\">").concat(show.name, "</h5>\n             <div><small>").concat(show.summary, "</small></div>\n             <button class=\"btn btn-outline-light btn-sm Show-getEpisodes\">\n               Episodes\n             </button>\n           </div>\n         </div>\n       </div>\n      "));
         $showsList.append($show);
     }
 }
 /** Handle search form submission: get shows from API and display.
  *    Hide episodes area (that only gets shown if they ask for episodes)
  */
+// ask about this promise void nonsense
 function searchForShowAndDisplay() {
     return __awaiter(this, void 0, void 0, function () {
         var term, shows;
@@ -12816,9 +12829,56 @@ $searchForm.on("submit", function (evt) {
 /** Given a show ID, get from API and return (promise) array of episodes:
  *      { id, name, season, number }
  */
-// async function getEpisodesOfShow(id) { }
+function getEpisodesOfShow(id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var resp;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, axios_1.default.get("".concat(BASE_URL_API, "/shows/").concat(id, "/episodes"))];
+                case 1:
+                    resp = _a.sent();
+                    return [2 /*return*/, resp.data.map(function (result) {
+                            return {
+                                id: result.id,
+                                name: result.name,
+                                season: result.season,
+                                number: result.number,
+                            };
+                        })];
+            }
+        });
+    });
+}
 /** Write a clear docstring for this function... */
-// function populateEpisodes(episodes) { }
+function populateEpisodes(episodes) {
+    $episodesList.empty();
+    for (var _i = 0, episodes_1 = episodes; _i < episodes_1.length; _i++) {
+        var episode = episodes_1[_i];
+        var $episode = $("<li>\n      ".concat(episode.name, "\n      (season ").concat(episode.season, ", episode ").concat(episode.number, ")\n    </li>\n   "));
+        $episodesList.append($episode);
+    }
+    $episodesArea.show();
+}
+function getEpisodesAndDisplay() {
+    return __awaiter(this, void 0, void 0, function () {
+        var showId, episodes;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    showId = $(".Show-getEpisodes")
+                        .closest(".Show")
+                        .data("show-id");
+                    return [4 /*yield*/, getEpisodesOfShow(showId)];
+                case 1:
+                    episodes = _a.sent();
+                    populateEpisodes(episodes);
+                    console.log(episodes);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+$showsList.on("click", ".Show-getEpisodes", getEpisodesAndDisplay);
 
 
 /***/ })
