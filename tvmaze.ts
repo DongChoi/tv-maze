@@ -125,15 +125,16 @@ function populateEpisodes(episodes: EpisodeInterface[]): void {
   $episodesArea.show();
 }
 
-async function getEpisodesAndDisplay(): Promise<void> {
-  const showId: number = $(".Show-getEpisodes")
+async function getEpisodesAndDisplay(evt:JQuery.ClickEvent): Promise<void> {
+  const showId: number = $(evt.target)
     .closest(".Show")
     .data("show-id");
 
   const episodes = await getEpisodesOfShow(showId);
 
+  debugger;
   populateEpisodes(episodes);
-  console.log(episodes);
+
 }
 
 $showsList.on("click", ".Show-getEpisodes", getEpisodesAndDisplay);

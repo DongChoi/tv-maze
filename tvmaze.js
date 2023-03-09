@@ -12859,18 +12859,20 @@ function populateEpisodes(episodes) {
     }
     $episodesArea.show();
 }
-function getEpisodesAndDisplay() {
+function getEpisodesAndDisplay(evt) {
     return __awaiter(this, void 0, void 0, function () {
         var showId, episodes;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    showId = $(".Show-getEpisodes")
+                    showId = $(evt.target)
                         .closest(".Show")
                         .data("show-id");
                     return [4 /*yield*/, getEpisodesOfShow(showId)];
                 case 1:
                     episodes = _a.sent();
+                    console.log("THIS IS THE SHOW ID", showId);
+                    debugger;
                     populateEpisodes(episodes);
                     console.log(episodes);
                     return [2 /*return*/];
