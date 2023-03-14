@@ -4,7 +4,7 @@
 Tv-maze is a TypeScript and vanilla HTML web application that utilizes a third-party API to retrieve information about episode lists of TV shows based on user search queries. The application's search bar allows users to input their queries, and the response is rendered with the show image, title, and description of the show. Additionally, the application features an "Episodes" button, which displays the episode name, season number, and episode number when clicked.
 
 
-![Screenshot of My Project](./static/images/pic07.png)]
+[![Demo](./static/images/pic07.png)]
 
 
 ### Getting Started
